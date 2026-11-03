@@ -8,9 +8,10 @@ public class Main {
 		
 		System.out.println("Digite o tabuleiro a ser usado.\n1 - Padrão\n2 - Teste Roque\n3 - Teste en passant");
 		int opcao = sc.nextInt();
-		if(opcao != 1 && opcao != 2 && opcao != 3) {
+		while(opcao != 1 && opcao != 2 && opcao != 3) {
 			System.out.println("Opção inválida.");
 			System.out.println("Digite o tabuleiro a ser usado.\n1 - Padrão\n2 - Teste Roque\n3 - Teste en passant");
+			opcao = sc.nextInt();
 		}
 		sc.nextLine();
 		
@@ -34,7 +35,7 @@ public class Main {
 					System.out.print("Você selecionou uma peça do oponente. ");
 					coordenadasYXOrigem = null;
 				}
-				if(xadrez.getPecaNome(coordenadasYXOrigem[0], coordenadasYXOrigem[1]).equals("")){
+				if(coordenadasYXOrigem != null && xadrez.getPecaNome(coordenadasYXOrigem[0], coordenadasYXOrigem[1]).equals("")){
 					System.out.print("Você não selecionou nenhuma peça. ");
 					coordenadasYXOrigem = null;
 				}
@@ -72,6 +73,7 @@ public class Main {
 				resultado = xadrez.moverPiece(pecaYOrigem, pecaXOrigem, pecaYDestino, pecaXDestino);
 				if (resultado) {
 					System.out.println("Movimento legal.");
+					xadrez.peoesParaRainhas();
 					System.out.println(xadrez.getTabuleiroFormatado(xadrez.getTabuleiroGlobal()));
 				} else {
 					System.out.println("Movimento ilegal.");
@@ -80,7 +82,6 @@ public class Main {
 				System.out.println("");
 
 			}
-			
 			xadrez.checarCheckMate();
 			if(xadrez.getVitoria().equals("")) {
 				System.out.println("Passando para proximo turno!");

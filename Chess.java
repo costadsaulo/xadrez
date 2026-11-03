@@ -1,3 +1,5 @@
+package chess;
+
 public class Chess {
 	private Piece[][] tabuleiroGlobal = new Piece[8][8];
 	private String turnoAtual;
@@ -90,7 +92,19 @@ public class Chess {
 		if(vitoriaPreto) return "preto";
 		return "";
 	}
-
+	
+	public void peoesParaRainhas(){
+		int ultimaLinha = this.tabuleiroGlobal.length - 1;
+		for(int i = 0; i < this.tabuleiroGlobal[0].length; i++){
+			if(this.tabuleiroGlobal[0][i] != null && this.tabuleiroGlobal[0][i].getCor().equals("branco") && this.tabuleiroGlobal[0][i].getNome().equals("Pe")){
+				tabuleiroGlobal[0][i] = new Piece("Ra","branco");
+			}
+			if(this.tabuleiroGlobal[ultimaLinha][i] != null && this.tabuleiroGlobal[ultimaLinha][i].getCor().equals("preto") && this.tabuleiroGlobal[ultimaLinha][i].getNome().equals("Pe")){
+				tabuleiroGlobal[ultimaLinha][i] = new Piece("Ra","preto");
+			}
+		}
+	}
+	
 	public void enPassantUpkeep() {
 		if(this.enPassant.equals(this.turnoAtual)) {
 			this.enPassant = "";
@@ -98,7 +112,7 @@ public class Chess {
 	}
 	
 	public int[] notacaoAlgebricaParaCoordenada(String notacao) {
-		notacao = notacao.stripIndent().strip();
+		notacao = notacao.strip();
 		if (notacao.length() != 2) return null;
 		if (!Character.isLetter(notacao.charAt(0)) || !Character.isDigit(notacao.charAt(1)))
 			return null;
@@ -613,7 +627,7 @@ public class Chess {
 			if (origemX < destinoX) diffX = 1;
 			if (origemX > destinoX) diffX = -1;
 
-			if (tabuleiro[origemY][origemX + diffX].getCor().equals(enPassant) && tabuleiro[origemY][origemX + diffX].getNome().equals("Pe") 
+			if (tabuleiro[origemY][origemX + diffX] != null && tabuleiro[origemY][origemX + diffX].getCor().equals(enPassant) && tabuleiro[origemY][origemX + diffX].getNome().equals("Pe") 
 					&& !tabuleiro[origemY][origemX + diffX].getCor().equals(tabuleiro[origemY][origemX].getCor())) {
 				
 				return true;
@@ -683,7 +697,7 @@ public class Chess {
 		int[][] casasAndadas = new int[8][2];
 		int posicaoCasasAndadas = 0;
 
-		if ((origemX == destinoX) ^ (origemY == destinoY)) {
+		if ((origemX != destinoX) && (origemY != destinoY)) {
 			if ((origemX + origemY) % 2 != (destinoX + destinoY) % 2) {
 				return null;
 			}
@@ -759,7 +773,7 @@ public class Chess {
 
 			return casasAndadas;
 		}
-		
+		System.out.println("!!!!!");
 		return null;
 	}
 
