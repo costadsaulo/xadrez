@@ -112,12 +112,7 @@ public class Chess {
 
 		return coordenadas;
 	}
-	
-	public String getEnPassant() {
-		return this.enPassant;
-	}
 
-	
 	public void checarCheckMate() {
 		if(turnoAtual.equals("branco") && !validarReiCheckMate(reiBrancoY, reiBrancoX)) {
 			System.out.println("Vitoria preto");
