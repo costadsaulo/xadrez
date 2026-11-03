@@ -234,6 +234,10 @@ public class Chess {
 			return false;
 		if (destinoX >= tabuleiroGlobal[0].length || destinoX < 0)
 			return false;
+		if ((origemX == destinoX) && (destinoY == origemY)){
+            return false;
+		}
+		
 		Piece peca = tabuleiroGlobal[origemY][origemX];
 		if (!peca.getCor().equals(turnoAtual))
 			return false;
