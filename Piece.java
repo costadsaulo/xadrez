@@ -5,7 +5,7 @@ public class Piece {
 	private String cor;
 	public static final String COR_BRANCA = "\u001B[0;37m";
 	public static final String ANSI_RESET = "\u001B[0m";
-	public static final String ANSI_RED = "\u001B[030m";
+	public static final String COR_PRETO = "\u001B[030m";
 	public static final String FUNDO_BRANCO = "\u001B[47m";
 	
 	public Piece(String nome, String cor){
@@ -25,7 +25,7 @@ public class Piece {
 		if(this.getCor().equals("branco")){
 			return COR_BRANCA + this.nome + ANSI_RESET;
 		} if(this.getCor().equals("preto")) {
-			return FUNDO_BRANCO + ANSI_RED + this.nome + ANSI_RESET;
+			return FUNDO_BRANCO + COR_PRETO + this.nome + ANSI_RESET;
 		} else return "";
 	}
 }
