@@ -57,17 +57,6 @@ public class Chess {
 			{ "", "  ", "  ", "Re", "  ", "  ", "  ", "" }, 
 			};
 	
-	private static final String[][] tabuleiroTesteCheque = { 
-			{ "To", "", "  ", "Re", "", "", "", "To" },
-			{ "Pe", "", "", "", "Pe", "", "", "" }, 
-			{ "  ", "  ", "  ", "  ", "  ", "Bi", "  ", "  " },
-			{ "  ", "", "  ", "  ", "  ", "  ", "  ", "Pe" }, 
-			{ "  ", "Pe", "  ", "  ", "  ", "  ", "  ", "  " },
-			{ "  ", "  ", "  ", "", "  ", "  ", "  ", "  " }, 
-			{ "Pe", "  ", "Pe", "  ", "", "", "", "" },
-			{ "", "  ", "  ", "Re", "  ", "  ", "  ", "" }, 
-			};
-	
 	public Chess(int escolhaTabuleiro) {
 		this.tabuleiroGlobal = new Piece[8][8];
 		this.turnoAtual = "branco";
@@ -93,9 +82,6 @@ public class Chess {
 		}
 		if(escolhaTabuleiro == 3) {
 			tabuleiroGlobal = tabuleiroStringParaPiece(tabuleiroTesteEnPassant, 5);
-		}
-		if(escolhaTabuleiro == 4) {
-			tabuleiroGlobal = tabuleiroStringParaPiece(tabuleiroTesteCheque, 1);
 		}
 	}
 	
