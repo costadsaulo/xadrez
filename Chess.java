@@ -300,7 +300,7 @@ public class Chess {
 						return false;
 					}
 					break;
-				case "Pe": //???
+				case "Pe":
 					if (validarPeao(tabuleiro, i, j, reiY, reiX)) {
 						return false;
 					}
