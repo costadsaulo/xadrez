@@ -1,7 +1,7 @@
 package chess;
 
 public class Chess {
-	private Piece[][] tabuleiroGlobal = new Piece[8][8];
+	private Piece[][] tabuleiroGlobal;
 	private String turnoAtual;
 
 	private int reiPretoY;
