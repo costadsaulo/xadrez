@@ -8,7 +8,7 @@ public class Main {
 		
 		System.out.println("Digite o tabuleiro a ser usado.\n1 - Padrão\n2 - Teste Roque\n3 - Teste en passant");
 		int opcao = sc.nextInt();
-		if(opcao != 1 && opcao != 2 && opcao != 3 && opcao != 4) {
+		if(opcao != 1 && opcao != 2 && opcao != 3) {
 			System.out.println("Opção inválida.");
 			System.out.println("Digite o tabuleiro a ser usado.\n1 - Padrão\n2 - Teste Roque\n3 - Teste en passant");
 		}
