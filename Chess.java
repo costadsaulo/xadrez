@@ -129,9 +129,9 @@ public class Chess {
 			this.enPassant = "";
 		}
 		if(this.turnoAtual.equals("branco")) {
-			teste(reiBrancoY, reiBrancoX);
+			validarEmpate(reiBrancoY, reiBrancoX);
 		} else {
-			teste(reiPretoY, reiPretoX);
+			validarEmpate(reiPretoY, reiPretoX);
 		}
 	}
 	
@@ -173,7 +173,7 @@ public class Chess {
 		return this.tabuleiroGlobal;
 	}
 	
-	public void teste(int reiY, int reiX) {
+	public void validarEmpate(int reiY, int reiX) {
 		boolean emCheque = false;
 		int movimentoLegal = 0;
 		int resultado = validarReiCheckMate(reiY, reiX);
