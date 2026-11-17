@@ -1,16 +1,17 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		
-		System.out.println("Digite o tabuleiro a ser usado.\n1 - Padrão\n2 - Teste Roque\n3 - Teste en passant");
+		System.out.println("Digite o tabuleiro a ser usado.\n1 - Padrão\n2 - Teste Roque\n3 - Teste en passant\n4 - Teste afogamento");
 		int opcao = sc.nextInt();
-		while(opcao != 1 && opcao != 2 && opcao != 3) {
+		while(opcao != 1 && opcao != 2 && opcao != 3 && opcao != 4) {
 			System.out.println("Opção inválida.");
-			System.out.println("Digite o tabuleiro a ser usado.\n1 - Padrão\n2 - Teste Roque\n3 - Teste en passant");
+			System.out.println("Digite o tabuleiro a ser usado.\n1 - Padrão\n2 - Teste Roque\n3 - Teste en passant\n4 - Teste afogamento");
 			opcao = sc.nextInt();
 		}
 		sc.nextLine();
@@ -19,39 +20,54 @@ public class Main {
 		
 		System.out.println(xadrez.getTabuleiroFormatado(xadrez.getTabuleiroGlobal()));
 		
-		 while(xadrez.getVitoria().equals("")) {
+		 while(xadrez.getVitoria().equals("") && !xadrez.getEmpate()) {
 			boolean resultado = false;
 			System.out.println("Turno atual: " + xadrez.getTurnoAtual());
 
 			xadrez.enPassantUpkeep();
 			
+			if(xadrez.getEmpate()) {
+				break;
+			}
+			
 			while (!resultado) {
-				System.out.println("Digite as coordenadas da origem da peça que deseja mover:");
-				String coordenadasAlgebricasOrigem = sc.nextLine();
-				int[] coordenadasYXOrigem = xadrez.notacaoAlgebricaParaCoordenada(coordenadasAlgebricasOrigem);
-				
-				if(xadrez.getPecaCor(coordenadasYXOrigem[0], coordenadasYXOrigem[1]) != xadrez.getTurnoAtual() 
-						&& xadrez.getPecaCor(coordenadasYXOrigem[0], coordenadasYXOrigem[1]) != "") {
-					System.out.print("Você selecionou uma peça do oponente. ");
-					coordenadasYXOrigem = null;
-				}
-				if(coordenadasYXOrigem != null && xadrez.getPecaNome(coordenadasYXOrigem[0], coordenadasYXOrigem[1]).equals("")){
-					System.out.print("Você não selecionou nenhuma peça. ");
-					coordenadasYXOrigem = null;
-				}
-				while (coordenadasYXOrigem == null) {
-					System.out.println("Coordenadas inválidas.");
-					
+				int[] coordenadasYXOrigem;
+				do {
 					System.out.println("Digite as coordenadas da origem da peça que deseja mover:");
-					coordenadasAlgebricasOrigem = sc.nextLine();
+					String coordenadasAlgebricasOrigem = sc.nextLine();
 					coordenadasYXOrigem = xadrez.notacaoAlgebricaParaCoordenada(coordenadasAlgebricasOrigem);
-				}
+					
+					if(coordenadasYXOrigem != null) {
+						if(xadrez.getPecaCor(coordenadasYXOrigem[0], coordenadasYXOrigem[1]) != xadrez.getTurnoAtual() 
+								&& xadrez.getPecaCor(coordenadasYXOrigem[0], coordenadasYXOrigem[1]) != "") {
+							System.out.print("Você selecionou uma peça do oponente. ");
+							coordenadasYXOrigem = null;
+						}
+						if(xadrez.getPecaNome(coordenadasYXOrigem[0], coordenadasYXOrigem[1]).equals("")){
+							System.out.print("Você não selecionou nenhuma peça. ");
+							coordenadasYXOrigem = null;
+						}
+					}
+				} while (coordenadasYXOrigem == null);
 
 				int pecaYOrigem = coordenadasYXOrigem[0];
 				int pecaXOrigem = coordenadasYXOrigem[1];
 
 				System.out.println("Peça escolhida: " + xadrez.getPecaNome(pecaYOrigem, pecaXOrigem));
+				ArrayList<Integer[]> caminhosValidos = new ArrayList<>();
 
+				for(int i = 0; i < xadrez.getTabuleiroGlobal().length; i++) {
+					for(int j = 0; j < xadrez.getTabuleiroGlobal()[0].length; j++) {
+						if(xadrez.validarMovimentoPeca(pecaYOrigem, pecaXOrigem, i, j, xadrez.getReiCoordenadas()[0], xadrez.getReiCoordenadas()[1])) {
+							Integer[] caminho = {i, j};
+							caminhosValidos.add(caminho);
+						}
+					}
+				}
+				
+
+				System.out.println(xadrez.getTabuleiroFormatado(caminhosValidos));
+				
 				System.out.println("Digite as coordenadas do destino da peça que deseja mover:");
 				String coordenadasAlgebricasDestino = sc.nextLine();
 				int[] coordenadasYXDestino = xadrez.notacaoAlgebricaParaCoordenada(coordenadasAlgebricasDestino);
@@ -87,9 +103,13 @@ public class Main {
 				System.out.println("Passando para proximo turno!");
 			}
 		}
-		
+		if(xadrez.getEmpate()) {
+			System.out.println("Empate!");
+		}
+		if(!xadrez.getVitoria().equals("")) {
+			System.out.println("Vitoria do: " + xadrez.getVitoria());
+		}
 		sc.close();
 		System.out.println("Encerrando o programa.");
 	}
 }
-
