@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.ArrayList;
+
 public class Chess {
 	private Piece[][] tabuleiroGlobal;
 	private String turnoAtual;
@@ -20,7 +22,8 @@ public class Chess {
 	
 	private String enPassant;
 	
-
+	private boolean empate;
+	
 	private static final String notacaoAlgebricaGlobal = "abcdefgh";
 
 	private boolean vitoriaBranco;
@@ -56,8 +59,19 @@ public class Chess {
 			{ "  ", "Pe", "  ", "  ", "  ", "  ", "  ", "  " },
 			{ "  ", "  ", "  ", "", "  ", "  ", "  ", "  " }, 
 			{ "Pe", "  ", "Pe", "  ", "", "", "", "" },
-			{ "", "  ", "  ", "Re", "  ", "  ", "  ", "" }, 
+			{ "", "  ", "  ", "Re", "  ", "  ", "  ", "" }
 			};
+	
+	private static final String[][] tabuleiroTesteAfogamento = {
+			{ "  ", "  ", "  ", "  ", "  ", "  ", "Re", "  " },
+			{ "Bi", "  ", "  ", "  ", "  ", "  ", "  ", "  " }, 
+			{ "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  " },
+			{ "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  " }, 
+			{ "  ", "  ", "  ", "  ", "  ", "  ", "  ", "Pe" },
+			{ "  ", "  ", "  ", "  ", "  ", "  ", "", "" }, 
+			{ "  ", "  ", "  ", "  ", "  ", "  ", "  ", "Pe" },
+			{ "  ", "  ", "  ", "  ", "  ", "  ", "  ", "Re" }
+	};
 	
 	public Chess(int escolhaTabuleiro) {
 		this.tabuleiroGlobal = new Piece[8][8];
@@ -65,6 +79,8 @@ public class Chess {
 		
 		this.vitoriaBranco = false;
 		this.vitoriaPreto = false;
+		
+		this.empate = false;
 		
 		this.enPassant = "";
 		
@@ -84,6 +100,9 @@ public class Chess {
 		}
 		if(escolhaTabuleiro == 3) {
 			tabuleiroGlobal = tabuleiroStringParaPiece(tabuleiroTesteEnPassant, 5);
+		}
+		if(escolhaTabuleiro == 4) {
+			tabuleiroGlobal = tabuleiroStringParaPiece(tabuleiroTesteAfogamento, 5);
 		}
 	}
 	
@@ -109,6 +128,11 @@ public class Chess {
 		if(this.enPassant.equals(this.turnoAtual)) {
 			this.enPassant = "";
 		}
+		if(this.turnoAtual.equals("branco")) {
+			teste(reiBrancoY, reiBrancoX);
+		} else {
+			teste(reiPretoY, reiPretoX);
+		}
 	}
 	
 	public int[] notacaoAlgebricaParaCoordenada(String notacao) {
@@ -121,6 +145,11 @@ public class Chess {
 
 		int pecaY = (Character.getNumericValue(notacao.charAt(1)) - 8) * -1;
 		int pecaX = notacaoAlgebricaGlobal.indexOf(notacao.charAt(0));
+		
+		if(pecaY == -1 || pecaX == -1) {
+			return null;
+		}
+		
 		coordenadas[0] = pecaY;
 		coordenadas[1] = pecaX;
 
@@ -128,12 +157,12 @@ public class Chess {
 	}
 
 	public void checarCheckMate() {
-		if(turnoAtual.equals("branco") && !validarReiCheckMate(reiBrancoY, reiBrancoX)) {
+		if(turnoAtual.equals("branco") && validarReiCheckMate(reiBrancoY, reiBrancoX) == -1) {
 			System.out.println("Vitoria preto");
 			vitoriaPreto = true;
 			return;
 		}
-		if(turnoAtual.equals("preto") && !validarReiCheckMate(reiPretoY, reiPretoX)) {
+		if(turnoAtual.equals("preto") && validarReiCheckMate(reiPretoY, reiPretoX) == -1) {
 			System.out.println("Vitoria branco");
 			vitoriaBranco = true;
 			return;
@@ -144,7 +173,42 @@ public class Chess {
 		return this.tabuleiroGlobal;
 	}
 	
-	private boolean validarReiCheckMate(int reiY, int reiX) {
+	public void teste(int reiY, int reiX) {
+		boolean emCheque = false;
+		int movimentoLegal = 0;
+		int resultado = validarReiCheckMate(reiY, reiX);
+		
+		if(resultado == -1) {
+			emCheque = true;
+		}
+		
+		
+		for(int i = reiY - 1; i <= reiY + 1; i++) {
+			for(int j = reiX - 1; j <= reiX + 1; j++) {
+				if(!validarCoordenadasLimite(i, j))
+					continue;
+				
+				if(!validarRei(tabuleiroGlobal, reiY, reiX, i, j)) {
+					continue;
+				}
+				if(validarMovimentoPeca(reiY, reiX, i, j, i, j)) {
+					movimentoLegal = 1;
+				} else {
+					if(movimentoLegal != 1) movimentoLegal = -1;
+				}
+			}
+		}
+
+		if(!emCheque && movimentoLegal == -1) {
+			this.empate = true;
+		}
+	}
+	
+	private int validarReiCheckMate(int reiY, int reiX) {
+		final int movimentoLegalDisponivel = 1;
+		final int semMovimentoLegalDisponivel = -1;
+		final int reiSemAmeacas = 0;
+		
 		for (int i = 0; i < tabuleiroGlobal.length; i++) {
 			for (int j = 0; j < tabuleiroGlobal[0].length; j++) {
 				if (tabuleiroGlobal[i][j] == null)
@@ -164,22 +228,12 @@ public class Chess {
 					for (int k = 0; k < tabuleiroGlobal.length; k++) {
 						for (int l = 0; l < tabuleiroGlobal[0].length; l++) {
 							if (validarMovimentoPeca(k, l, i, j, reiY, reiX)) {
-								return true;
+								return movimentoLegalDisponivel;
 							}
 						}
 					}
 
-					for (int k = reiY - 1; k < reiY + 1; k++) {
-						for (int l = reiX - 1; l < reiX + 1; l++) {
-							if (k == reiY && l == reiX)
-								continue;
-							if (validarMovimentoPeca(reiY, reiX, k, l, k, l)) {
-								return true;
-							}
-						}
-					}
-					System.out.println("Cheque cavalo ou peao ou rei?");
-					return false;
+					return semMovimentoLegalDisponivel;
 				}
 
 				if (nome.equals("To") || nome.equals("Ra") || nome.equals("Bi")) {
@@ -197,7 +251,7 @@ public class Chess {
 							for (int l = 0; l < tabuleiroGlobal.length; l++) {
 								for (int m = 0; m < tabuleiroGlobal[0].length; m++) {
 									if (tabuleiroGlobal[l][m] != null && !tabuleiroGlobal[l][m].getNome().equals("Re") && validarMovimentoPeca(l, m, destinoXAtual, destinoYAtual, reiY, reiX)) {
-										return true;
+										return movimentoLegalDisponivel;
 									}
 								}
 							}
@@ -206,33 +260,35 @@ public class Chess {
 						for (int k = 0; k < tabuleiroGlobal.length; k++) {
 							for (int l = 0; l < tabuleiroGlobal[0].length; l++) {
 								if (tabuleiroGlobal[k][l] != null && validarMovimentoPeca(k, l, i, j, reiY, reiX)) {
-									return true;
+									return movimentoLegalDisponivel;
 								}
 
 							}
 						}
 						
-						return false;
+						return semMovimentoLegalDisponivel;
 					}
 				}
 			}
 		}		
 
 
+		return reiSemAmeacas;
+	}
+	
+	private boolean validarCoordenadasLimite(int coordenadaY, int coordenadaX) {
+		if (coordenadaY >= tabuleiroGlobal.length || coordenadaY < 0)
+			return false;
+		if (coordenadaX >= tabuleiroGlobal[0].length || coordenadaX < 0)
+			return false;
+		
 		return true;
 	}
 	
-	private boolean validarMovimentoPeca(int origemY, int origemX, int destinoY, int destinoX, int reiY, int reiX) {
+	public boolean validarMovimentoPeca(int origemY, int origemX, int destinoY, int destinoX, int reiY, int reiX) {
 		if (tabuleiroGlobal[origemY][origemX] == null)
 			return false;
-		if (origemY >= tabuleiroGlobal.length || origemY < 0)
-			return false;
-		if (origemX >= tabuleiroGlobal[0].length || origemX < 0)
-			return false;
-
-		if (destinoY >= tabuleiroGlobal.length || destinoY < 0)
-			return false;
-		if (destinoX >= tabuleiroGlobal[0].length || destinoX < 0)
+		if(!validarCoordenadasLimite(origemY, origemX) || !validarCoordenadasLimite(destinoY, destinoX))
 			return false;
 		if ((origemX == destinoX) && (destinoY == origemY)){
             return false;
@@ -499,14 +555,12 @@ public class Chess {
 			if(origemX != destinoX) {
 				if(origemX + 1 < 8 && tabuleiroGlobal[origemY][origemX + 1] != null) {
 					if(tabuleiroGlobal[origemY][origemX + 1].getCor().equals(enPassant) && tabuleiroGlobal[origemY][origemX + 1].getNome().equals("Pe")) {
-						System.out.println("EN passant direita teste");
 						tabuleiroGlobal[origemY][origemX + 1] = null;
 					}
 				}
 
 				if(origemX - 1 >= 0 && tabuleiroGlobal[origemY][origemX - 1] != null) {
 					if(tabuleiroGlobal[origemY][origemX - 1].getCor().equals(enPassant) && tabuleiroGlobal[origemY][origemX - 1].getNome().equals("Pe")) {
-						System.out.println("EN passant esquerda teste");
 						tabuleiroGlobal[origemY][origemX - 1] = null;
 					}
 				}
@@ -615,7 +669,6 @@ public class Chess {
 		}
 
 		if (tabuleiro[destinoY][destinoX] == null) {
-			
 			if(dirY == -2 || dirY == +2) {
 				if(this.turnoAtual.equals(tabuleiro[origemY][origemX].getCor())) {
 					if(this.turnoAtual.equals("branco")) {
@@ -644,7 +697,7 @@ public class Chess {
 			return false;
 		}
 
-		if (origemX + 1 != destinoX && origemX - 1 != destinoX) {
+		if (origemX + 1 != destinoX && origemX - 1 != destinoX || dirY == 2) {
 			return false;
 		}
 
@@ -777,7 +830,6 @@ public class Chess {
 
 			return casasAndadas;
 		}
-		System.out.println("!!!!!");
 		return null;
 	}
 
@@ -825,7 +877,6 @@ public class Chess {
 		}
 
 		if (tabuleiro[destinoY][destinoX].getCor().equals(tabuleiro[origemY][origemX].getCor())) {
-			System.out.println("AAAAA");
 			return null;
 		}
 
@@ -855,6 +906,80 @@ public class Chess {
 		return "";
 	}
 	
+	public boolean getEmpate() {
+		return this.empate;
+	}
+	
+	public String getTabuleiroFormatado(ArrayList<Integer[]> posicoesAPintar) {
+		String tabuleiroFormatado = "";
+		tabuleiroFormatado += "    ";
+		for (int i = 0; i < tabuleiroGlobal[0].length; i++) {
+			tabuleiroFormatado += ("  " + notacaoAlgebricaGlobal.charAt(i) + "   ");
+		}
+
+		tabuleiroFormatado +=  "\n    ";
+		for (int i = 0; i < tabuleiroGlobal[0].length; i++) {
+			tabuleiroFormatado += "______";
+		}
+		tabuleiroFormatado += "\n";
+		for (int i = 0; i < tabuleiroGlobal.length; i++) {
+			tabuleiroFormatado += (8 - i + " | ");
+			for (int j = 0; j < tabuleiroGlobal[0].length; j++) {
+				boolean pintar = false;
+				for(Integer[] coord : posicoesAPintar) {
+					if(coord[0] == i && coord[1] == j) {
+						pintar = true;
+					}
+				}
+				
+				if(pintar) {
+					tabuleiroFormatado += "\u001B[1;31m";
+					tabuleiroFormatado += "[ ";
+					tabuleiroFormatado += "\u001B[0m";
+				}
+				else {
+					tabuleiroFormatado += "[ ";
+				}
+				if (tabuleiroGlobal[i][j] != null)
+					tabuleiroFormatado += tabuleiroGlobal[i][j].getNomeFormatado();
+				else
+					tabuleiroFormatado += "  ";
+				if(pintar) {
+					tabuleiroFormatado += "\u001B[1;31m";
+					tabuleiroFormatado += " ]";
+					tabuleiroFormatado += "\u001B[0m";
+				}
+				else {
+					tabuleiroFormatado += " ]";
+				}
+			}
+			tabuleiroFormatado += "\n";
+		}
+		tabuleiroFormatado += "\n";
+		return tabuleiroFormatado;
+	}
+	
+	public int[] getReiCoordenadas() {
+		if(this.turnoAtual.equals("branco")) {
+			return new int[] {this.reiBrancoY, this.reiBrancoX};
+		}
+		return new int[] {this.reiPretoY, this.reiPretoX};
+	}
+	public int getReiBrancoY() {
+		return this.reiBrancoY;
+	}
+	
+	public int getReiBrancoX() {
+		return this.getReiBrancoX();
+	}
+	
+	public int getReiPretoY() {
+		return this.reiPretoY;
+	}
+	
+	public int getReiPretoX() {
+		return this.reiPretoX;
+	}
 	public String getTabuleiroFormatado(Piece[][] tabuleiro) {
 		String tabuleiroFormatado = "";
 		tabuleiroFormatado += "    ";
